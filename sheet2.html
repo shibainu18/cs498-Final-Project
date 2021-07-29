@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Final Project</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://d3js.org/d3.v4.js"></script>
+  <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
+  <script src="https://rawgit.com/susielu/d3-annotation/master/d3-annotation.min.js"></script>
+
+
+</head>
+
+<body data-spy="scroll" data-target=".scrollspy">
+  <nav class="navbar navbar-dark navbar-fixed-top" style="background-color: #e3f2fd;">
+    <div class="container">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false"
+          aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+        <a class="navbar-brand" href="index.html"><strong>World's Electricity</strong></a>
+      </div>
+      <div id="navbar" class="collapse navbar-collapse">
+        <ul class="nav navbar-nav">
+          <li><a href="sheet1.html">Access to Electricity</a></li>
+          <li><a href="sheet2.html">Consumption and Green Electricity</a></li>
+          <li><a href="sheet3.html">CO2 Emissions and Green Energy</a></li>
+          <li><a href="sheet4.html">About</a></li>
+        </a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+
+  <div class="container">
+    <br>
+    <br>
+    <div class="page-header" style="text-align: center;">
+      <h1>Electricity Consumption and Production from Green Sources</h1>
+    </div>
+    <p class="lead">
+      ‘Green electricity’ means electricity produced from renewable sources such as wind, solar and hydro. They  have a much lower environmental impact than fossil fuels like coal and gas. They are collectively referred to as renewable energy sources, because they don’t use up a limited resource. And when used to generate electricity, it is called green electricity.
+    </p>
+
+    <p class="lead">
+      The visualization below depicts the electric power consumption per capita (kWh) of the countries with respect to their population. We fail to see any observable trend between the population and per capita consumption, in fact, it seems to decline with increasing population. The variable size circles show the total amount of electric energy being generate by a specific country through renewable sources and the color groups the countries by their regions.
+    </p>
+
+    <p class="lead">
+      From the plot, we can infer that countries in the Europe and Central Asia region tend to have higher electrical consumption as well as they produce relatively more electricity from renewable sources. United States being one of the counties with the highest electricity Production through renewable sources. Further, we can see that countries in the Sub-Saharan Africa region tend to have low electricity consumption and almost negligible production from renewable sources. 
+    </p>
+
+    <br>
+
+    <div style="text-align: center;" id="my_dataviz"></div>
+
+    <div style="text-align: right;;">Source : WDI | Year : 2012</div>
+
+
+  </div>
+
+  <ul class="pager">
+    <li><a href="sheet1.html" style="background-color: #e3f2fd;">Previous</a></li>
+    <li><a href="sheet3.html" style="background-color: #e3f2fd;">Next</a></li>
+  </ul>
+
+  <footer class="footer">
+    <div class="container" style="padding-bottom: 30px; text-align: center;">
+      <strong>Anant Ashutosh Sharma</strong> | anantas2@illinois.edu
+    </div>
+  </footer>
+
+  <style>
+    .bubbles {
+      stroke-width: 2px;
+      stroke: white;
+    }
+    .bubbles:hover {
+      stroke: black;
+    }
+    </style>
+
+
+  <script>
+
+    // set the dimensions and margins of the graph
+    var margin = {top: 10, right: 20, bottom: 60, left: 50},
+        width = 650 - margin.left - margin.right,
+        height = 500 - margin.top - margin.bottom;
+    
+    // append the svg object to the body of the page
+    var svg = d3.select("#my_dataviz")
+      .append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+      .append("g")
+        .attr("transform",
+              "translate(" + margin.left + "," + margin.top + ")");
+    
+    //Read the data
+    d3.csv("https://raw.githubusercontent.com/shibainu18/cs498-Final-Project/main/data_main%20copy%202.1.csv", function(data) {
+    
+      // Add X axis
+      var x = d3.scaleLog()
+        .domain([30000,10000000000])
+        .range([ 1, width ]);
+      svg.append("g")
+        .attr("transform", "translate(0," + height + ")")
+        .call(d3.axisBottom(x).ticks(5).tickFormat(function(d) {
+          return d/1000000 + " million"
+        }));
+
+
+        svg.append("text")             
+      .attr("transform",
+            "translate(" + (width/2) + " ," + 
+                           (height + margin.top + 30) + ")")
+      .style("text-anchor", "middle")
+      .text("Population");
+    
+      // Add Y axis
+      var y = d3.scaleLog()
+        .domain([40 , 60000])
+        .range([ height, 1]);
+      svg.append("g")
+        .call(d3.axisLeft(y).ticks(3).tickFormat(function(d) {
+          return d/1000 + "k"
+        }));
+
+      svg.append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 0 - margin.left)
+      .attr("x",0 - (height / 2))
+      .attr("dy", "1em")
+      .style("text-anchor", "middle")
+      .text("Electric Power Consumption (kWH per capita)"); 
+    
+      // Add a scale for bubble size
+      var z = d3.scaleLinear()
+        .domain([100, 1000000000000])
+        .range([ 4, 150]);
+    
+      // Add a scale for bubble color
+      var myColor = d3.scaleOrdinal()
+        .domain(["East Asia & Pacific", "Europe & Central Asia", "Latin America & Caribbean", "Middle East & North Africa", "North America", "South Asia", "Sub-Saharan Africa"])
+        .range(d3.schemeSet2);
+    
+      // -1- Create a tooltip div that is hidden by default:
+      var tooltip = d3.select("#my_dataviz")
+        .append("div")
+          .style("opacity", 0)
+          .attr("class", "tooltip")
+          .style("background-color", "black")
+          .style("border-radius", "5px")
+          .style("padding", "10px")
+          .style("color", "white")
+    
+      // -2- Create 3 functions to show / update (when mouse move but stay on same circle) / hide the tooltip
+      var showTooltip = function(d) {
+        tooltip
+          .transition()
+          .duration(200)
+        tooltip
+          .style("opacity", 1)
+          .html("Country : " + d.countryName +"<br>" + "Region : " + d.Region + "<br>"
+                  + "Electricity Production from Renewable Sources : " + d.elec_from_renew/1000000000 + " billion kWh")
+          .style("left", (d3.mouse(this)[0]+150) + "px")
+          .style("top", (d3.mouse(this)[1]+500) + "px")
+      }
+      var moveTooltip = function(d) {
+        tooltip
+          .style("left", (d3.mouse(this)[0]+150) + "px")
+          .style("top", (d3.mouse(this)[1]+500) + "px")
+      }
+      var hideTooltip = function(d) {
+        tooltip
+          .transition()
+          .duration(200)
+          .style("opacity", 0)
+      }
+
+
+      const annotations = [
+      {
+        note: {
+          title: "South Asia and Sub Saharan Africa Countries",
+          label: "Low Electricity Consumption"
+        },
+        type: d3.annotationCalloutCircle,
+        subject: {
+          radius: 75,         // circle radius
+          radiusPadding: 5   // white space around circle befor connector
+        },
+        color: ["brown"],
+        x: 330,
+        y: 350,
+        dy: -25,
+        dx: -150
+      }
+    ]
+
+    // Add annotation to the chart
+    const makeAnnotations = d3.annotation()
+      .annotations(annotations)
+
+
+
+      const annotations2 = [
+      {
+        note: {
+          title: "Europe and Central Asia",
+          label: "High Electricity Consumption and High Production from Renewable Sources"
+        },
+        type: d3.annotationCalloutCircle,
+        subject: {
+          radius: 75,         // circle radius
+          radiusPadding: 5   // white space around circle befor connector
+        },
+        
+        color: ["orange"],
+        x: 280,
+        y: 150,
+        dy: 150,
+        dx: 200
+      }
+    ]
+
+    // Add annotation to the chart
+    const makeAnnotations2 = d3.annotation()
+      .annotations(annotations2)
+    
+      svg.append('g')
+      .call(makeAnnotations2)
+
+      // Add dots
+      svg.append('g')
+      .call(makeAnnotations)
+        .selectAll("dot")
+        .data(data.filter(function(d,i){return (y(d.Elec_power_cons)<1000000 && d.Region != "")}))
+        .enter()
+        .append("circle")
+          .attr("class", "bubbles")
+          .attr("cx", function (d) { return x(d.pop); } )
+          .attr("cy", function (d) { return y(d.Elec_power_cons); } )
+          .attr("r", function (d) { return z(d.elec_from_renew); } )
+          .style("fill", function (d) { 
+            if (d.Region == "") {
+              return "#ffffff";
+            } else {
+              return myColor(d.Region);
+            }
+          })
+        // -3- Trigger the functions
+        .on("mouseover", showTooltip )
+        .on("mousemove", moveTooltip )
+        .on("mouseleave", hideTooltip )
+    
+      })
+    </script>
+
+</body>
+
+</html>

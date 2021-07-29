@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CS 498 - Final Project</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" />
+
+<script src="https://d3js.org/d3.v4.js"></script>
+<script src="https://rawgit.com/susielu/d3-annotation/master/d3-annotation.min.js"></script>
+<style>
+    /* basic positioning */
+  .legend { list-style: none; }
+  .legend li { float: left; margin-right: 10px; }
+  .legend span { border: 1px solid #ccc; float: left; width: 12px; height: 12px; margin: 2px; }
+  /* your colors */
+  .legend .low { background-color: #808000; }
+  .legend .lowermiddle { background-color: #FFA500; }
+  .legend .uppermiddle { background-color: #800000; }
+  .legend .high { background-color: #ff0000; }
+
+</style>
+</head>
+
+<body data-spy="scroll" data-target=".scrollspy">
+  <nav class="navbar navbar-dark navbar-fixed-top" style="background-color: #e3f2fd;">
+    <div class="container">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false"
+          aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+        <a class="navbar-brand" href="index.html"><strong>World's Electricity</strong></a>
+      </div>
+      <div id="navbar" class="collapse navbar-collapse">
+        <ul class="nav navbar-nav">
+          <li><a href="sheet1.html">Access to Electricity</a></li>
+          <li><a href="sheet2.html">Consumption and Green Electricity</a></li>
+          <li><a href="sheet3.html">CO2 Emissions and Green Energy</a></li>
+          <li><a href="sheet4.html">About</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+
+  <div class="container">
+    <br>
+    <br>
+    <div class="page-header" style="text-align: center;">
+      <h1>World's Access to Electricity</h1>
+    </div>
+    <p class="lead">
+      Poverty reduction, economic growth, and higher living conditions all require electricity. Measuring the percentage of individuals who have access to electricity is thus a significant social and economic metric. At a global level, the percentage of people with access to electricity has been steadily increasing over the last few decades. 
+    </p>
+    
+    <p class="lead">
+      In scatter plot below, each plotted datapoint represents a Country. The graph depicts a country's access to electricy as a percentage of the country's population on the vertical access and the country's population on the horizontal axis. Further, the countries have been group on the basis of their Income Group and each group has been depicted with different colors. 
+    </p>
+
+    <p class="lead"> 
+      From the graph, we can see in most High Income country, 100% of the population has access to electricty. Whereas, the Low Income countries lie at the bottom with their almost only 20% of their population having access to electricty. We can see that the middle income countries lie almost in the middle of the plot. Further, population seems to have negligible impact on the access to electricity of the countries since we can see no definite pattern between the two.
+    </p>
+
+    <p class="lead"> 
+      With this plot, we can infer that the Access to electricity is closely related to the Income Group of the countries with populations of high income countries having more access to electricity than populations of low income countries. 
+    </p>
+    <br>
+
+
+    <div style="text-align: center;" id="my_dataviz"></div>
+
+    <div style="text-align: center;">
+      <ul class="legend">
+        <li><span class="low"></span> Low Income</li>
+        <li><span class="lowermiddle"></span> Lower Middle Income</li>
+        <li><span class="uppermiddle"></span> Upper Middle Income</li>
+        <li><span class="high"></span> High Income</li>
+      </ul>
+    </div>
+
+    <div style="text-align: right;">Source : WDI | Year : 2012</div>
+
+
+  </div>
+
+  
+
+  <ul class="pager">
+    <li><a href="index.html" style="background-color: #e3f2fd;">Previous</a></li>
+    <li><a href="sheet2.html" style="background-color: #e3f2fd;">Next</a></li>
+  </ul>
+
+  <footer class="footer">
+    <div class="container" style="padding-bottom: 30px; text-align: center;">
+      <strong>Anant Ashutosh Sharma</strong> | anantas2@illinois.edu
+    </div>
+  </footer>
+
+
+  <script>
+
+  // set the dimensions and margins of the graph
+  var margin = {top: 10, right: 30, bottom: 30, left: 60},
+      width = 600 - margin.left - margin.right,
+      height = 500 - margin.top - margin.bottom;
+
+  // append the svg object to the body of the page
+  var svg = d3.select("#my_dataviz")
+    .append("svg")
+      .attr("width", width + margin.left + margin.right)
+      .attr("height", height + margin.top + margin.bottom + 20)
+    .append("g")
+      .attr("transform",
+            "translate(" + margin.left + "," + margin.top + ")");
+
+  //Read the data
+  d3.csv("https://raw.githubusercontent.com/shibainu18/cs498-Final-Project/main/data_main%20copy%202.1.csv", function(data) {
+
+    // Add X axis
+    var x = d3.scaleLog()
+      .domain([10000,1000000000])
+      .range([ 1, width ]);
+    svg.append("g")
+      .attr("transform", "translate(0," + height + ")")
+      .call(d3.axisBottom(x).ticks(5).tickFormat(function(d) {
+          return d/1000000 + " million"
+        }));
+
+      svg.append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 0 - margin.left)
+      .attr("x",0 - (height / 2))
+      .attr("dy", "1em")
+      .style("text-anchor", "middle")
+      .text("Access to Electricity (% of Population)"); 
+      
+      
+      svg.append("text")             
+      .attr("transform",
+            "translate(" + (width/2) + " ," + 
+                           (height + margin.top + 30) + ")")
+      .style("text-anchor", "middle")
+      .text("Population");
+
+    // Add Y axis
+    var y = d3.scaleLinear()
+      .domain([0, 100])
+      .range([ height, 0]);
+    svg.append("g")
+      .call(d3.axisLeft(y));
+
+    // Add a tooltip div. Here I define the general feature of the tooltip: stuff that do not depend on the data point.
+    // Its opacity is set to 0: we don't see it by default.
+    var tooltip = d3.select("#my_dataviz")
+      .append("div")
+      .style("opacity", 0)
+      .attr("class", "tooltip")
+      .style("background-color", "white")
+      .style("border", "solid")
+      .style("border-width", "1px")
+      .style("border-radius", "5px")
+      .style("padding", "10px")
+
+
+
+    // A function that change this tooltip when the user hover a point.
+    // Its opacity is set to 1: we can now see it. Plus it set the text and position of tooltip depending on the datapoint (d)
+    var mouseover = function(d) {
+      tooltip
+        .style("opacity", 1)
+        .html(d.countryName + "<br>" + d.Income_group + " Group")
+        .style("left", (d3.mouse(this)[0]+250) + "px") // It is important to put the +90: other wise the tooltip is exactly where the point is an it creates a weird effect
+        .style("top", d3.mouse(this)[1]+650 + "px")
+    }
+
+    var mousemove = function(d) {
+      tooltip
+      .style("opacity", 1)
+      .html(d.countryName + "<br>" + d.Income_group + " Group")
+      .style("left", (d3.mouse(this)[0]+250) + "px") // It is important to put the +90: other wise the tooltip is exactly where the point is an it creates a weird effect
+      .style("top", d3.mouse(this)[1]+700 + "px")
+    }
+
+    // A function that change this tooltip when the leaves a point: just need to set opacity to 0 again
+    var mouseleave = function(d) {
+      tooltip
+        .transition()
+        .duration(200)
+        .style("opacity", 0)
+    }
+
+    const annotations = [
+      {
+        note: {
+          title: "Low Income Countries",
+          label: "Majority have low access to electricity"
+        },
+        type: d3.annotationCalloutCircle,
+        subject: {
+          radius: 75,         // circle radius
+          radiusPadding: 5   // white space around circle befor connector
+        },
+        color: ["green"],
+        x: 300,
+        y: 380,
+        dy: -25,
+        dx: -150
+      }
+    ]
+
+    // Add annotation to the chart
+    const makeAnnotations = d3.annotation()
+      .annotations(annotations)
+
+    
+
+    // Add dots
+    svg.append('g')
+      .call(makeAnnotations)
+      .selectAll("dot")
+      .data(data) // the .filter part is just to keep a few dots on the chart, not all of them
+      .enter()
+      .append("circle")
+        .attr("cx", function (d) { return x(d.pop); } )
+        .attr("cy", function (d) { return y(d.elec_access); } )
+        .attr("r", 6)
+        .style("fill", function (d) {
+          if (d.Income_group == "High income") {
+            return "#ff0000"
+          }
+          else if (d.Income_group == "Upper middle income")
+            return "#800000"
+
+          else if (d.Income_group == "Lower middle income")
+          return "#FFA500"
+
+          else if (d.Income_group == "Low income")
+          return "#808000"
+
+          else {
+            return "#ffffff"
+          }
+        })
+        .style("opacity", 0.7)
+        .style("stroke", "white")
+      .on("mouseover", mouseover )
+      .on("mouseleave", mouseleave )
+
+
+  })
+
+  </script>
+
+
+</body>
+
+</html>
